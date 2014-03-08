@@ -377,6 +377,7 @@ function s:reFeedCond()
     if s:wantAlwaysReFeed() || s:isReFeedCheckpoint()
         if v:char != ' '
             unlet! s:posLast s:lastUncompletable
+            call s:log("refeeding")
             call s:feedPopup()
         endif
     endif
@@ -427,6 +428,7 @@ endfunction
 
 "
 function s:isModifiedSinceLastCall()
+  call s:log("isModifiedSinceLastCall")
   if exists('s:posLast')
     let posPrev = s:posLast
     let nLinesPrev = s:nLinesLast
@@ -436,32 +438,47 @@ function s:isModifiedSinceLastCall()
   let s:nLinesLast = line('$')
   let s:textLast = getline('.')
   if !exists('posPrev')
+    call s:log("A")
     return 1
   elseif posPrev[1] != s:posLast[1] || nLinesPrev != s:nLinesLast
     return (posPrev[1] - s:posLast[1] == nLinesPrev - s:nLinesLast)
   elseif textPrev ==# s:textLast
+    call s:log("B")
     return 0
   elseif posPrev[2] > s:posLast[2]
+    call s:log("C")
     return 1
   elseif has('gui_running') && has('multi_byte')
     " NOTE: auto-popup causes a strange behavior when IME/XIM is working
+    call s:log("D")
     return posPrev[2] + 1 == s:posLast[2]
   endif
+  call s:log("E ".string(posPrev[2])." ".string(s:posLast[2]))
   return posPrev[2] != s:posLast[2]
 endfunction
 
+function s:log(text)
+  echom a:text." (".getline('.').")"
+endfunction
 "
 function s:makeCurrentBehaviorSet()
+  call s:log("makeCurrentBehaviorSet")
   let modified = s:isModifiedSinceLastCall()
   if exists('s:behavsCurrent[s:iBehavs].repeat') && s:behavsCurrent[s:iBehavs].repeat
+    call s:log("bsA")
     let behavs = [ s:behavsCurrent[s:iBehavs] ]
   elseif exists('s:behavsCurrent[s:iBehavs]')
+    call s:log("bsB")
+    call s:log(string(s:behavsCurrent[s:iBehavs]))
+    call s:log(string(s:iBehavs))
     return []
   elseif modified
+    call s:log("bsC")
     let behavs = copy(exists('g:acp_behavior[&filetype]')
           \           ? g:acp_behavior[&filetype]
           \           : g:acp_behavior['*'])
   else
+    call s:log("bsD")
     return []
   endif
   let text = s:getCurrentText()
@@ -470,15 +487,24 @@ function s:makeCurrentBehaviorSet()
   if exists('s:lastUncompletable') &&
         \ stridx(s:getCurrentWord(), s:lastUncompletable.word) == 0 &&
         \ map(copy(behavs), 'v:val.command') ==# s:lastUncompletable.commands
+    call s:log("bsE")
     let behavs = []
   else
+    call s:log("bsF")
     unlet! s:lastUncompletable
   endif
+    call s:log("bsG")
   return behavs
 endfunction
 
 "
+function acp#popup()
+  unlet! s:posLast s:lastUncompletable
+  return s:feedPopup()
+endfunction
+
 function s:feedPopup()
+  call s:log("feedPopup")
   " NOTE: CursorMovedI is not triggered while the popup menu is visible. And
   "       it will be triggered when popup menu is disappeared.
   if s:lockCount > 0 || &paste
@@ -486,12 +512,15 @@ function s:feedPopup()
   endif
   if exists('s:behavsCurrent[s:iBehavs].onPopupClose')
     if !call(s:behavsCurrent[s:iBehavs].onPopupClose, [])
+      call s:log("not call")
       call s:finishPopup(1)
       return ''
     endif
   endif
+  call s:log("making current behavior set")
   let s:behavsCurrent = s:makeCurrentBehaviorSet()
   if empty(s:behavsCurrent)
+    call s:log("empty behavs")
     call s:finishPopup(1)
     return ''
   endif
@@ -521,9 +550,14 @@ function s:feedPopup()
   call feedkeys(s:behavsCurrent[s:iBehavs].command . "\<C-r>=acp#onPopupPost()\<CR>", 'n')
   return '' " this function is called by <C-r>=
 endfunction
+function Echo(text)
+  echom a:text
+  return ''
+endfunction
 
 "
 function s:finishPopup(fGroup1)
+  call s:log("finishPopup")
   inoremap <C-h> <Nop> | iunmap <C-h>
   inoremap <BS>  <Nop> | iunmap <BS>
   let s:behavsCurrent = []
@@ -535,6 +569,7 @@ endfunction
 
 "
 function s:setCompletefunc()
+  call s:log("setCompletefunc")
   if exists('s:behavsCurrent[s:iBehavs].completefunc')
     call l9#tempvariables#set(s:TEMP_VARIABLES_GROUP0,
           \ '&completefunc', s:behavsCurrent[s:iBehavs].completefunc)
