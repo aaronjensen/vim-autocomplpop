@@ -455,8 +455,11 @@ function s:makeCurrentBehaviorSet()
   let modified = s:isModifiedSinceLastCall()
   if exists('s:behavsCurrent[s:iBehavs].repeat') && s:behavsCurrent[s:iBehavs].repeat
     let behavs = [ s:behavsCurrent[s:iBehavs] ]
-  elseif exists('s:behavsCurrent[s:iBehavs]')
-    return []
+  " This alledgedly fixed a bug, but with it, autocomplete does not trigger
+  " immediately after a previous completion finishes. For example:
+  " foo<complete>.<popup>, the popup does not popup right away.
+  " elseif exists('s:behavsCurrent[s:iBehavs]')
+  "   return []
   elseif modified
     let behavs = copy(exists('g:acp_behavior[&filetype]')
           \           ? g:acp_behavior[&filetype]
