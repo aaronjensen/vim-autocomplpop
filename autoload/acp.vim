@@ -22,12 +22,8 @@ function acp#enable()
     autocmd InsertLeave * call s:finishPopup(1)
   augroup END
 
-  if g:acp_mappingDriven
-    call s:mapForMappingDriven()
-  else
-    autocmd AcpGlobalAutoCommand CursorMovedI * call s:feedPopup()
-    autocmd AcpGlobalAutoCommand InsertCharPre * call s:reFeedCond()
-  endif
+  autocmd AcpGlobalAutoCommand CursorMovedI * call s:feedPopup()
+  autocmd AcpGlobalAutoCommand InsertCharPre * call s:reFeedCond()
 
   nnoremap <silent> i i<C-r>=<SID>feedPopup()<CR>
   nnoremap <silent> a a<C-r>=<SID>feedPopup()<CR>
@@ -36,7 +32,6 @@ endfunction
 
 "
 function acp#disable()
-  call s:unmapForMappingDriven()
   augroup AcpGlobalAutoCommand
     autocmd!
   augroup END
@@ -383,34 +378,6 @@ function s:reFeedCond()
 endfun
 
 "
-function s:mapForMappingDriven()
-  call s:unmapForMappingDriven()
-  let s:keysMappingDriven = [
-        \ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-        \ 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-        \ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-        \ 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-        \ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-        \ '-', '_', '~', '^', '.', ',', ':', '!', '#', '=', '%', '$', '@', '<', '>', '/', '\',
-        \ '<Space>', '<C-h>', '<BS>', ]
-  for key in s:keysMappingDriven
-    execute printf('inoremap <silent> %s %s<C-r>=<SID>feedPopup()<CR>',
-          \        key, key)
-  endfor
-endfunction
-
-"
-function s:unmapForMappingDriven()
-  if !exists('s:keysMappingDriven')
-    return
-  endif
-  for key in s:keysMappingDriven
-    execute 'iunmap ' . key
-  endfor
-  let s:keysMappingDriven = []
-endfunction
-
-"
 function s:getCurrentWord()
   return matchstr(s:getCurrentText(), '\k*$')
 endfunction
@@ -511,9 +478,8 @@ function s:feedPopup()
   call l9#tempvariables#set(s:TEMP_VARIABLES_GROUP0,
         \ '&ignorecase', g:acp_ignorecaseOption)
   " NOTE: With CursorMovedI driven, Set 'lazyredraw' to avoid flickering.
-  "       With Mapping driven, set 'nolazyredraw' to make a popup menu visible.
   call l9#tempvariables#set(s:TEMP_VARIABLES_GROUP0,
-        \ '&lazyredraw', !g:acp_mappingDriven)
+        \ '&lazyredraw', 1)
   " NOTE: 'textwidth' must be restored after <C-e>.
   call l9#tempvariables#set(s:TEMP_VARIABLES_GROUP1,
         \ '&textwidth', 0)

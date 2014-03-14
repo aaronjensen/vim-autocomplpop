@@ -138,13 +138,6 @@ OPTIONS                                                          *acp-options*
 <
         If non-zero, auto-popup is enabled at startup.
 
-                                                      *g:acp_mappingDriven*  >
-  let g:acp_mappingDriven = 0
-<
-        If non-zero, auto-popup is triggered by key mappings instead of
-        |CursorMovedI| event. This is useful to avoid auto-popup by moving
-        cursor in Insert mode.
-
                                                    *g:acp_ignorecaseOption*  >
   let g:acp_ignorecaseOption = 1
 <

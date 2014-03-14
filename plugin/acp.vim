@@ -140,7 +140,6 @@ hi AutoComplPopColorDefaultReverse  ctermfg=Black ctermbg=Magenta guibg=LightMag
 
 "-----------------------------------------------------------------------------
 call l9#defineVariableDefault('g:acp_enableAtStartup', 1)
-call l9#defineVariableDefault('g:acp_mappingDriven', 0)
 call l9#defineVariableDefault('g:acp_ignorecaseOption', 1)
 call l9#defineVariableDefault('g:acp_autoselectFirstCompletion', 0)
 call l9#defineVariableDefault('g:acp_completeOption', '.,w,b,k')
