@@ -174,7 +174,7 @@ OPTIONS                                                          *acp-options*
         How to select the next item.  A list of two items where the first item
         is the actual mapping, and the second an expression of what to do when
         the popup menu is not open.  It requires escaping according to
-        *popupmenu-keys* (see pumvisible())
+        |popupmenu-keys| (see pumvisible())
 
                                                  *g:acp_previousItem*  >
   let g:acp_previousItem = ['<S-TAB>', '\<lt>S-TAB>']
@@ -182,7 +182,7 @@ OPTIONS                                                          *acp-options*
         How to select the previous item.  A list of two items where the first
         item is the actual mapping, and the second an expression of what to do
         when the popup menu is not open.  It requires escaping according to
-        *popupmenu-keys* (see pumvisible())
+        |popupmenu-keys| (see pumvisible())
 
                                                  *g:acp_reverseMappingInReverseMenu*  >
   let g:acp_reverseMappingInReverseMenu = 1
@@ -201,7 +201,7 @@ OPTIONS                                                          *acp-options*
                                                  *g:acp_refeed_checkpoints*  >
   let g:acp_refeed_checkpoints = []
 <
-        Similar to *g:acp_refeed_after_every_char* but update the menu at
+        Similar to |g:acp_refeed_after_every_char| but update the menu at
         particular word lengths.  The value is a list of word lengths.  Only
         alphanumeric characters are considered when finding the length of the
         word before the cursor.
